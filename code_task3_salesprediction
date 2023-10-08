@@ -1,0 +1,57 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt 
+import seaborn as sns
+import plotly.express as px
+import warnings
+warnings.filterwarnings('ignore')
+df = pd.read_csv('D:\car_purchasing.csv',encoding='ISO-8859-1')
+df.head()
+df.sample(5)
+df.info()
+df.describe()
+df.isnull().sum()
+df.duplicated().sum()
+cols = ['country','gender', 'age',
+       'annual Salary', 'credit card debt', 'net worth']
+plt.figure(figsize=(18, 12))
+for i in range(6) :
+    plt.subplot(2,3,i+1)
+    #sns.set()
+    plt.scatter(df[cols[i]],df['car purchase amount'],color='#679C94')
+    plt.title(cols[i])
+    plt.ylabel('car purchase amount',size=13)
+plt.show()
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+
+x=df[ ['gender', 'age',
+       'annual Salary', 'credit card debt', 'net worth']]
+y=df[['car purchase amount']]
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import OrdinalEncoder
+scaler = StandardScaler()
+x= scaler.fit_transform(x)
+
+x_train , x_test , y_train , y_test = train_test_split(x,y,test_size=.2,shuffle=True)
+
+model = LinearRegression()
+
+model.fit(x_train,y_train)
+
+y_pred = model.predict(x_test)
+
+from sklearn.metrics import r2_score
+print(f''' The train accuracy : {r2_score(y_train,model.predict(x_train))}
+The test accuracy : {r2_score(y_test , y_pred)}''')
+
+random_forest = RandomForestRegressor(n_estimators=100)
+random_forest.fit(x_train,y_train)
+
+random_f_pred = random_forest.predict(x_test)
+
+r2_score(y_test,random_f_pred)
